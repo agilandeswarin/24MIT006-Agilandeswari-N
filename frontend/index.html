@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+</style>
+
+  <meta charset="UTF-8" />
+  <title>CropSevai Hub</title>
+
+  <!-- Website Title Logo -->
+  
+
+
+<link rel="icon" type="image/png" sizes="64x64" href="Logo-removebg-preview.png">
+<link rel="apple-touch-icon" sizes="180x180" href="Logo-removebg-preview.png">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+
+<body class="overflow-x-hidden bg-gradient-to-br from-green-50 via-white to-green-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const slides = [
+      "new.png",
+      "ferti.png",
+      "plant.png",
+      "Modern-Agricultural-Technology.png"
+    ];
+
+    const DashboardStat = ({ title, value }) => (
+  <div className="bg-white rounded-2xl p-8
+                  border border-gray-200
+                  shadow-[0_10px_40px_-20px_rgba(0,0,0,0.25)]">
+    <p className="text-sm text-gray-500">{title}</p>
+    <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+  </div>
+);
+
+function App() {
+
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+ const [activePage, setActivePage] = React.useState("crops");
+
+
+  const [login, setLogin] = React.useState(false);
+  const [index, setIndex] = React.useState(0);
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  // ✅ ADD HERE
+  const [selectedCrop, setSelectedCrop] = React.useState("");
+  const [selectedDisease, setSelectedDisease] = React.useState("");
+
+const [userData, setUserData] = React.useState(null);
+const [showMenu, setShowMenu] = React.useState(false);
+
+
+  React.useEffect(() => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+
+  if (token && user) {
+    setIsLoggedIn(true);
+    setUserData(JSON.parse(user));
+  } else {
+    setIsLoggedIn(false);
+    setUserData(null);
+  }
+}, []);
+
+
+
+  // Slider auto change
+// ================= HERO SLIDER AUTO SCROLL =================
+React.useEffect(() => {
+  const interval = setInterval(() => {
+    setIndex((prev) => (prev + 1) % slides.length);
+  }, 3500); // change image every 4 seconds
+
+  return () => clearInterval(interval);
+}, []);
+
+
+
+
+  // STOP background scroll when login is open
+  React.useEffect(() => {
+    document.body.style.overflow = login ? "hidden" : "auto";
+  }, [login]);
+
+  const handleLogin = () => {
+  fetch("http://localhost:5000/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+     window.location.href = "dashboard.html";
+   // 🚀 THIS is what you were missing
+    } else {
+      alert("Login failed");
+    }
+  })
+  .catch(() => alert("Server not running"));
+};
+
+
+
+
+
+  return (
+    <div className="relative">
+
+{/* ================= NAVBAR ================= */}
+{/* ================= NAVBAR ================= */}
+<nav className="fixed top-0 left-0 w-full h-16 z-50
+                bg-black/40 backdrop-blur-md
+                text-white px-8 flex justify-between items-center">
+
+  <div className="flex items-center gap-0">
+    <img src="Logo-removebg-preview.png" className="h-20" />
+    <span className="text-2xl font-bold -ml-4">CropSevai Hub</span>
+  </div>
+
+  <div className="flex gap-6 items-center">
+  <button onClick={() => {
+  document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
+}}>
+  Home
+</button>
+
+<button onClick={() => {
+  document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+}}>
+  Services
+</button>
+
+<button onClick={() => {
+  document.getElementById("crops")?.scrollIntoView({ behavior: "smooth" });
+}}>
+  Crops
+</button>
+
+
+  {!isLoggedIn ? (
+  <button
+    onClick={() => setLogin(true)}
+    className="bg-green-600 px-5 py-2 rounded-lg">
+    Login
+  </button>
+) : (
+  <div className="relative">
+    {/* Avatar */}
+    <button
+      onClick={() => setShowMenu(!showMenu)}
+      className="w-10 h-10 rounded-full bg-green-600
+                 flex items-center justify-center
+                 text-white font-bold uppercase">
+      {userData?.email?.[0]}
+    </button>
+
+    {/* Dropdown */}
+    {showMenu && (
+      <div className="absolute right-0 mt-3 w-40
+                      bg-white text-gray-800 rounded-xl
+                      shadow-xl overflow-hidden z-50">
+        <div className="px-4 py-3 text-sm border-b">
+          {userData?.email}
+        </div>
+
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setIsLoggedIn(false);
+            setUserData(null);
+            setShowMenu(false);
+          }}
+          className="w-full text-left px-4 py-2
+                     hover:bg-red-50 text-red-600">
+          Logout
+        </button>
+      </div>
+    )}
+  </div>
+)}
+
+</div>
+
+
+ 
+</nav>
+
+
+
+{/* ================= LOGIN MODAL ================= */}
+
+{/* ================= PROFESSIONAL LOGIN MODAL ================= */}
+{/* ================= PROFESSIONAL LOGIN MODAL ================= */}
+{login && (
+  <div className="fixed inset-0 z-[9999]
+                  flex items-center justify-center
+                  bg-black/70 backdrop-blur-sm">
+
+    <div className="w-full max-w-md bg-white rounded-2xl
+                    shadow-[0_40px_120px_rgba(0,0,0,0.35)]
+                    relative overflow-hidden">
+
+      {/* Header */}
+      <div className="px-8 pt-8 pb-4 border-b">
+        <h2 className="text-2xl font-bold text-gray-900 text-center">
+          Sign in to CropSevai Hub
+        </h2>
+        <p className="text-sm text-gray-500 text-center mt-2">
+          Smart Agriculture Decision Platform
+        </p>
+      </div>
+
+      {/* Body */}
+      <div className="px-8 py-6 space-y-4">
+        <input
+  type="email"
+  placeholder="Email address"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  className="w-full px-4 py-3 border rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-green-500"
+/>
+
+
+       <input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  className="w-full px-4 py-3 border rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-green-500"
+/>
+
+
+        <button
+  onClick={handleLogin}
+  className="w-full mt-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700">
+  Login
+</button>
+
+      </div>
+
+      {/* Footer */}
+      <div className="px-8 py-4 bg-gray-50 text-center text-sm text-gray-500">
+        © 2026 CropSevai Hub
+      </div>
+
+      {/* Close */}
+      <button
+        onClick={() => setLogin(false)}
+        className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+        ✕
+      </button>
+
+    </div>
+  </div>
+)}
+
+
+{/* ================= HERO SLIDER ================= */}
+<section id="home" className="relative h-screen w-screen overflow-hidden">
+
+
+  {slides.map((img, i) => (
+    <img
+      key={i}
+      src={img}
+      className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000
+      ${i === index ? "opacity-100 scale-100" : "opacity-0 scale-110"}`}
+    />
+  ))}
+  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20"></div>
+
+  <div className="absolute inset-0 flex items-center justify-center text-center">
+    <div className="text-white px-6 max-w-4xl">
+      <h2 className="text-6xl font-extrabold mb-6">
+        Smart Agriculture Platform
+      </h2>
+      <p className="text-2xl font-light">
+        Precision Guidance for Every Farmer, Every Crop
+      </p>
+    </div>
+  </div>
+</section>
+
+{/* ================= PROFESSIONAL FEATURE SECTION ================= */}
+<section id="services" className="relative py-32 bg-gradient-to-br from-blue-50 via-green-50 to-white overflow-hidden">
+
+  <div className="absolute inset-0 bg-gradient-to-r from-blue-100/40 to-green-100/40"></div>
+
+  <div className="relative max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-16 items-center">
+
+    {/* LEFT – VISUAL MOCK */}
+   {/* LEFT – VISUAL MOCK */}
+<div>
+  {/* Box */}
+  <div className="bg-white rounded-3xl shadow-2xl p-8 transition-transform duration-500 hover:scale-105">
+
+    <div className="grid grid-cols-3 gap-6 text-gray-800">
+
+      {/* Top 3 cards */}
+      {[
+        { title: "Crop Selection", icon: "🌾" },
+        { title: "Pest Detection", icon: "🕵️‍♂️" },
+        { title: "Treatment", icon: "💧" },
+      ].map((item, idx) => (
+        <div key={idx}
+             className="bg-gradient-to-r from-green-100 to-green-200 p-6 rounded-xl flex flex-col items-center justify-center
+                        text-gray-900 font-medium shadow-sm
+                        hover:from-green-200 hover:to-green-300
+                        hover:scale-105 transition-all duration-300">
+          <div className="text-3xl mb-2">{item.icon}</div>
+          <div className="text-center">{item.title}</div>
+        </div>
+      ))}
+
+      {/* Dashboard card */}
+      <div className="col-span-3 mt-6 bg-white rounded-2xl shadow-lg p-6 text-center font-semibold
+                      border border-gray-200
+                      hover:shadow-2xl transition-shadow duration-500 text-lg">
+        Smart Crop Advisory Dashboard
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{/* RIGHT – CONTENT */}
+<div>
+  <h3 className="text-5xl font-extrabold mb-6 text-gray-900">
+    Customize how your farming decisions work
+  </h3>
+
+  <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+    CropSevai Hub enables farmers and agricultural professionals to
+    configure, simplify, and automate complex crop advisory workflows —
+    ensuring the right action at the right time for maximum yield.
+  </p>
+
+  <ul className="space-y-4 text-gray-700">
+    <li>✔ Decision-based farming guidance</li>
+    <li>✔ Region-specific crop intelligence</li>
+    <li>✔ Organic & chemical comparison</li>
+    <li>✔ Smart alerts and reminders</li>
+  </ul>
+</div>
+
+
+  </div>
+</section>
+
+<section className="relative py-28 bg-gradient-to-br from-green-50 via-white to-green-100 overflow-hidden">
+
+  {/* background accents */}
+  <div className="absolute -top-24 -left-24 w-[420px] h-[420px] bg-green-200/30 rounded-full blur-3xl"></div>
+  <div className="absolute bottom-0 right-0 w-[420px] h-[420px] bg-emerald-200/30 rounded-full blur-3xl"></div>
+
+  <h3 className="text-4xl md:text-5xl font-extrabold text-center mb-6 text-gray-900">
+    How It Works
+  </h3>
+
+  <div className="relative max-w-7xl mx-auto px-10">
+
+    {/* animated connector */}
+    <div className="hidden md:block absolute top-[90px] left-10 right-10 h-[2px] bg-gray-200 overflow-hidden">
+      <div className="h-full w-1/3 bg-gradient-to-r from-green-400 to-emerald-500 animate-pulse"></div>
+    </div>
+
+    <div className="grid md:grid-cols-4 gap-12 relative z-10">
+      <HowCard icon="🌱" title="Select Crop" index={0} />
+      <HowCard icon="🐛" title="Identify Problem" index={1} />
+      <HowCard icon="🧪" title="Get Solution" index={2} />
+      <HowCard icon="📈" title="Increase Yield" index={3} />
+    </div>
+
+  </div>
+</section>
+
+
+
+
+{/* ================= ADVISORY FLOW ================= */}
+{/* ================= CROP ADVISORY FLOW – CORPORATE ================= */}
+<section className="relative py-32 bg-[#f7faf8]">
+
+  {/* subtle grid background */}
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5efe8_1px,transparent_1px),
+                  linear-gradient(to_bottom,#e5efe8_1px,transparent_1px)]
+                  bg-[size:48px_48px] opacity-40"></div>
+
+  <div className="relative max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-20 items-center">
+
+    {/* LEFT – FLOW CONTENT */}
+    <div>
+      <h3 className="text-5xl font-extrabold text-gray-900 mb-8">
+        Crop Advisory Flow
+      </h3>
+
+      <p className="text-lg text-gray-600 mb-12 leading-relaxed max-w-xl">
+        A structured digital advisory system that guides farmers through
+        crop management decisions using scientifically backed recommendations.
+      </p>
+
+      <div className="space-y-8">
+        <FlowRow
+          title="Crop Information"
+          text="General crop growth stages, soil needs, and seasonal requirements."
+        />
+        <FlowRow
+          title="Problem Assessment"
+          text="Identification of common nutrient deficiencies and stress conditions."
+        />
+        <FlowRow
+          title="Advisory Recommendation"
+          text="Balanced fertilizer usage, application timing, and preventive measures."
+        />
+      </div>
+    </div>
+
+    {/* RIGHT – MOBILE MOCKUP */}
+    <div className="relative flex justify-center">
+
+      <div className="relative w-[280px] h-[560px] bg-[#111827]
+                      rounded-[42px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)]
+                      border-[6px] border-gray-800">
+
+        {/* camera notch */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2
+                        w-20 h-2 bg-gray-700 rounded-full"></div>
+
+        {/* screen */}
+        <div className="absolute inset-3 rounded-[34px] bg-white p-6">
+
+          <h4 className="text-sm font-semibold text-green-700 mb-6 text-center">
+            CropSevai Hub Advisory
+          </h4>
+
+          <div className="space-y-5 text-sm text-gray-700">
+
+            <div className="border rounded-xl p-4">
+              <h5 className="font-semibold text-gray-800 mb-1">
+                Fertilizer Guidance
+              </h5>
+              <p className="text-gray-600">
+                Improves soil fertility and supports balanced plant growth.
+              </p>
+            </div>
+
+            <div className="border rounded-xl p-4">
+              <h5 className="font-semibold text-gray-800 mb-1">
+                Application Timing
+              </h5>
+              <p className="text-gray-600">
+                Ensures nutrients are applied at the right growth stage.
+              </p>
+            </div>
+
+            <div className="border rounded-xl p-4">
+              <h5 className="font-semibold text-gray-800 mb-1">
+                Best Practices
+              </h5>
+              <p className="text-gray-600">
+                Reduces wastage and improves overall crop productivity.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="mt-8 text-center">
+            <button className="px-6 py-2 text-sm font-semibold
+                              bg-green-600 text-white rounded-full">
+              View Advisory
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+{/* ================= USERS ================= */}
+{/* ================= USERS – CORPORATE ================= */}
+<section id="crops" className="relative py-28 bg-white">
+
+
+
+  {/* subtle background pattern */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#e6f4ea,transparent_60%)]"></div>
+
+  <div className="relative max-w-7xl mx-auto px-12">
+
+    {/* heading */}
+    <div className="text-center mb-20">
+      <h3 className="text-5xl font-extrabold text-gray-900 mb-4">
+        Who Can Use CropSevai Hub
+      </h3>
+      <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+        Designed for every stakeholder in the agricultural ecosystem — from
+        field-level farmers to institutional decision-makers.
+      </p>
+    </div>
+
+    {/* cards */}
+    <div className="grid md:grid-cols-3 gap-12">
+
+      <UserCard
+        icon="🌾"
+        title="Farmers"
+        desc="Get crop-specific guidance, fertilizer recommendations, and pest control solutions tailored to your land and season."
+      />
+
+      <UserCard
+        icon="🎓"
+        title="Students"
+        desc="Learn modern agricultural practices, crop science concepts, and real-world advisory workflows."
+      />
+
+      <UserCard
+        icon="🏛️"
+        title="Agri Officers"
+        desc="Support farmers with structured advisory systems, regional insights, and best-practice recommendations."
+      />
+
+    </div>
+  </div>
+</section>
+
+
+
+{/* ================= FUTURE ================= */}
+<section className="relative py-32 bg-[#f9fbfa]">
+
+  {/* professional grid background */}
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),
+                  linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)]
+                  bg-[size:64px_64px] opacity-30"></div>
+
+  <div className="relative max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-24 items-center">
+
+    {/* LEFT – CONTENT */}
+    <div>
+      <p className="text-sm font-semibold tracking-widest text-cyan-700 uppercase mb-4">
+        Roadmap
+      </p>
+
+      <h3 className="text-5xl font-extrabold text-gray-900 mb-8">
+        Future Scope
+      </h3>
+
+      <p className="text-lg text-gray-600 leading-relaxed max-w-xl mb-12">
+        CropSevai Hub is envisioned as a scalable digital agriculture platform
+        that continuously evolves to support farmers, institutions, and
+        policymakers with intelligent decision-making tools.
+      </p>
+
+      <ul className="space-y-6">
+        <li className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-cyan-500 text-white rounded-full shadow-lg text-xl">
+            🌿
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            AI-powered crop disease and nutrient deficiency detection for precise interventions.
+          </p>
+        </li>
+        <li className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-sky-500 text-white rounded-full shadow-lg text-xl">
+            🌦️
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            Weather-based alerts and predictive insights for proactive farm management.
+          </p>
+        </li>
+        <li className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-amber-500 text-white rounded-full shadow-lg text-xl">
+            🌍
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            Multilingual accessibility and regional customization for diverse farmers.
+          </p>
+        </li>
+        <li className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-500 text-white rounded-full shadow-lg text-xl">
+            📈
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            Integration with government schemes, subsidies, and advisory programs.
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    {/* RIGHT – CENTERED STRATEGIC BOX */}
+    <div className="flex justify-center">
+      <div className="relative bg-white rounded-3xl p-12 w-full max-w-md
+                      border border-gray-200
+                      shadow-[0_28px_70px_-40px_rgba(0,0,0,0.25)] hover:shadow-[0_40px_90px_-30px_rgba(0,0,0,0.3)]
+                      transition-shadow duration-500">
+
+        {/* top accent */}
+        <div className="absolute top-0 left-0 right-0 h-1.5
+                        bg-gradient-to-r from-cyan-500 to-indigo-500
+                        rounded-t-3xl"></div>
+
+        <h4 className="text-2xl font-semibold text-gray-900 mb-8">
+          Strategic Focus
+        </h4>
+
+        <div className="space-y-6">
+
+          <div className="flex gap-4 items-start">
+            <div className="w-3 h-3 mt-2 bg-gradient-to-r from-cyan-400 to-sky-400 rounded-full shadow-sm"></div>
+            <p className="text-gray-700 leading-relaxed">
+              AI-driven advisory intelligence for real-time crop management.
+            </p>
+          </div>
+
+          <div className="flex gap-4 items-start">
+            <div className="w-3 h-3 mt-2 bg-gradient-to-r from-cyan-400 to-sky-400 rounded-full shadow-sm"></div>
+            <p className="text-gray-700 leading-relaxed">
+              Climate-aware, policy-aligned insights to support sustainable farming.
+            </p>
+          </div>
+
+          <div className="flex gap-4 items-start">
+            <div className="w-3 h-3 mt-2 bg-gradient-to-r from-cyan-400 to-sky-400 rounded-full shadow-sm"></div>
+            <p className="text-gray-700 leading-relaxed">
+              Scalable platform designed for nationwide adoption and growth.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+<footer className="bg-gray-900 text-gray-400 text-center py-6">
+  © 2026 CropSevai Hub | Smart Digital Agriculture Platform | Created by Agilandeswari N
+</footer>
+
+        </div>
+      );
+    }
+
+    const Step = ({icon, title}) => (
+      <div>
+        <div className="text-5xl mb-4">{icon}</div>
+        <h4 className="font-semibold">{title}</h4>
+      </div>
+    );
+
+
+const HowCard = ({ icon, title, index }) => {
+  const [active, setActive] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setActive(prev => !prev);
+    }, 4000 + index * 600);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    
+    <div className={`relative bg-white/80 backdrop-blur-xl
+                    border rounded-3xl px-8 py-12 text-center
+                    transition-all duration-500
+                    ${active ? "border-green-500 shadow-2xl scale-105"
+                             : "border-gray-200 shadow-lg"}`}>
+
+      {/* icon badge */}
+      <div className={`w-20 h-20 mx-auto mb-6 flex items-center justify-center
+                      rounded-2xl text-4xl shadow-md
+                      ${active
+                        ? "bg-gradient-to-br from-green-500 to-emerald-400 text-white"
+                        : "bg-gray-100 text-gray-700"}`}>
+        {icon}
+      </div>
+
+      <h4 className="text-lg font-semibold text-gray-800">
+        {title}
+      </h4>
+
+      {/* indicator */}
+      <div className={`mt-4 h-[3px] w-10 mx-auto rounded-full transition-all
+                      ${active ? "bg-green-500" : "bg-gray-300"}`}></div>
+    </div>
+  );
+};
+
+    const FlowRow = ({ title, text }) => (
+  <div className="flex gap-6 items-start">
+    <div className="w-3 h-3 mt-2 bg-green-600 rounded-full"></div>
+    <div>
+      <h4 className="text-lg font-semibold text-gray-800">
+        {title}
+      </h4>
+      <p className="text-gray-600 leading-relaxed max-w-lg">
+        {text}
+      </p>
+    </div>
+  </div>
+);
+
+
+    const UserCard = ({ icon, title, desc }) => (
+  <div className="group relative bg-white rounded-3xl p-10
+                  border border-gray-200
+                  shadow-[0_10px_40px_-20px_rgba(0,0,0,0.2)]
+                  transition-all duration-500
+                  hover:-translate-y-2
+                  hover:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.3)]">
+
+    {/* icon container */}
+    <div className="w-16 h-16 mb-8 flex items-center justify-center
+                    rounded-2xl text-3xl
+                    bg-gradient-to-br from-green-500 to-emerald-400
+                    text-white shadow-lg">
+      {icon}
+    </div>
+
+    <h4 className="text-2xl font-semibold text-gray-900 mb-4">
+      {title}
+    </h4>
+
+    <p className="text-gray-600 leading-relaxed">
+      {desc}
+    </p>
+
+    {/* hover indicator */}
+    <div className="mt-8 h-[3px] w-12 rounded-full
+                    bg-gray-200
+                    group-hover:bg-green-500
+                    transition-all"></div>
+  </div>
+);
+
+
+
+
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
+
+
+

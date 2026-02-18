@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CropSevai Hub | Crop Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  body{
+    background: linear-gradient(135deg, #d9fbe8 0%, #f7fcbf 100%);
+  }
+  .glass{
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(18px);
+  }
+</style>
+</head>
+
+<body class="min-h-screen">
+
+<!-- Header -->
+<div class="glass shadow-md px-10 py-5 flex justify-between items-center sticky top-0 z-50">
+  <h1 class="text-2xl font-extrabold text-green-700">🌿 CropSevai Hub</h1>
+  <a href="crops.html" class="text-blue-600 font-semibold hover:underline">
+    ← Back to Crops
+  </a>
+</div>
+
+<!-- Crop Card -->
+<div class="max-w-4xl mx-auto mt-12 px-6">
+
+  <div class="rounded-[28px] overflow-hidden bg-white shadow-2xl">
+
+    <!-- Image -->
+    <div class="relative h-72">
+      <img id="cropImage"
+           class="absolute inset-0 w-full h-full object-cover">
+
+      <!-- Season Badge -->
+      <div id="seasonBadge"
+           class="absolute top-4 right-4 bg-white text-green-700
+                  px-4 py-1 rounded-full text-sm font-semibold shadow">
+      </div>
+
+      <!-- Green Fade -->
+      <div class="absolute inset-x-0 bottom-0 h-32
+                  bg-gradient-to-t from-green-200 to-transparent"></div>
+
+      <!-- Crop Name -->
+      <h1 id="cropName"
+          class="absolute bottom-6 left-6
+                 text-4xl font-extrabold text-white drop-shadow">
+      </h1>
+    </div>
+
+    <!-- Info Section -->
+    <div class="px-6 py-6">
+      <div class="flex justify-between text-slate-700 mb-6">
+        <span class="flex items-center gap-2">
+          🌱 Soil: <b id="soilType"></b>
+        </span>
+        <span class="flex items-center gap-2">
+          💧 Water: <b id="waterReq"></b>
+        </span>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex gap-4">
+        <a id="diseaseBtn"
+           class="flex-1 bg-red-500 hover:bg-red-600
+                  text-white py-3 rounded-xl
+                  font-semibold text-center shadow">
+          🦠 Diseases
+        </a>
+
+        <a id="fertilizerBtn"
+           class="flex-1 bg-green-600 hover:bg-green-700
+                  text-white py-3 rounded-xl
+                  font-semibold text-center shadow">
+          🌱 Fertilizers
+        </a>
+
+        <a id="advisoryBtn"
+           class="flex-1 bg-yellow-500 hover:bg-yellow-600
+                  text-white py-3 rounded-xl
+                  font-semibold text-center shadow">
+          ⚠ Advisory
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Disease Section -->
+<div class="max-w-6xl mx-auto px-10 py-16">
+  <h2 class="text-4xl font-extrabold text-red-600 mb-10">
+    🦠 Disease Threats
+  </h2>
+
+  <div id="diseases"
+       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+  </div>
+</div>
+
+<script>
+const id = new URLSearchParams(window.location.search).get("id");
+
+const cropImages = {
+  Rice: "rice.jpg",
+  Wheat: "wheat.jpg",
+  Cotton: "cotton.jpg",
+  Maize: "maize.jpg",
+  Sugarcane: "sugarcane.jpg",
+  Onion: "onion.jpg",
+  Tomato: "tomato.jpg",
+  Chilli: "chilli.jpg",
+  Turmeric: "turmaric.jpg",
+  Brinjal: "brinjal.jpg",
+  Carrot: "carrot.jpg",
+  Beans: "beans.jpg",
+  Beetroot: "beetroot.jpg",
+  BitterGourd: "bittergourd.jpg",
+  Pumpkin: "pumkin.jpg",
+  Cucumber: "cucumber.jpg",
+  Watermelon: "watermelon.jpg", 
+  BottleGourd: "bottlegourd.jpg",
+  RidgeGourd: "ridgegourd.jpg",
+  SnakeGourd: "snakegourd.jpg",
+  Cauliflower: "cauliflower.jpg",
+  Coriander: "coriander.jpg",
+  Potato: "potato.jpg",
+  Guava: "guava.jpg",
+  Papaya: "papaya.jpg",
+  Mango: "mango.jpg",
+  Banana: "banana.jpg",
+  Apple: "apple.jpg",
+  Groundnut: "groundnut.jpg",
+  Tea: "tea.jpg"
+
+};
+
+fetch("http://localhost:5000/api/crops/" + id)
+.then(res => res.json())
+.then(c => {
+  cropName.innerText = c.name;
+  soilType.innerText = c.soil_type;
+  waterReq.innerText = c.water_requirement;
+  seasonBadge.innerText = c.season;
+
+  cropImage.src = cropImages[c.name] || "rice.jpg";
+
+  diseaseBtn.href = `disease.html?crop_id=${c.id}`;
+  fertilizerBtn.href = `fertilizer.html?crop_id=${c.id}`;
+  advisoryBtn.href = `advisory.html?crop_id=${c.id}`;
+});
+
+fetch("http://localhost:5000/api/crops/" + id + "/diseases")
+.then(res => res.json())
+.then(data => {
+  const box = document.getElementById("diseases");
+
+  data.forEach(d => {
+    box.innerHTML += `
+      <div class="glass rounded-[24px] p-6 shadow-xl
+                  border-t-4 border-red-500
+                  hover:-translate-y-2 transition cursor-pointer"
+           onclick="openDisease(${d.id})">
+
+        <h3 class="text-xl font-bold text-red-600 mb-2">
+          ${d.disease_name}
+        </h3>
+
+        <p class="text-slate-700 mb-3">
+          Severity: <b>${d.severity}</b>
+        </p>
+
+        <span class="text-sm text-slate-500">
+          Click to view treatment & medicine
+        </span>
+      </div>
+    `;
+  });
+});
+
+function openDisease(id){
+  window.location = "disease.html?disease_id=" + id;
+}
+</script>
+
+</body>
+</html>

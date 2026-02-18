@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CropSevai – Fertilizer Advisory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+        linear-gradient(180deg, rgba(15,23,42,0.75), rgba(15,23,42,0.85)),
+        url("hand-of-farmer.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* Hide Google Translate UI */
+    .goog-logo-link,
+    .goog-te-gadget,
+    body > .skiptranslate {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="h-screen overflow-y-auto flex flex-col text-slate-900">
+
+
+<!-- ================= NAVBAR ================= -->
+<nav class="fixed top-0 inset-x-0 z-50
+           bg-white/90 backdrop-blur-xl
+           border-b border-white/30 shadow-md h-14">
+
+
+  <div class="max-w-7xl mx-auto px-6 h-full flex items-center">
+
+
+
+    <!-- Logo -->
+    <div class="flex items-center gap-2">
+      <span class="text-xl">🌱</span>
+      <span class="text-lg font-extrabold text-green-700">CropSevai</span>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <!-- Language Toggle -->
+    <!-- Language Toggle -->
+<div class="flex items-center bg-white rounded-full p-1 shadow-md
+            border border-gray-200 notranslate"
+     translate="no">
+
+  <!-- Tamil -->
+  <button id="btn-ta" onclick="translateTamil()"
+    class="flex items-center gap-1 px-4 py-1.5 text-sm font-semibold
+           rounded-full transition">
+    🌐 Tamil
+  </button>
+
+  <!-- English -->
+  <button id="btn-en" onclick="translateEnglish()"
+    class="flex items-center gap-1 px-4 py-1.5 text-sm font-semibold
+           rounded-full transition">
+    🌐 English
+  </button>
+
+</div>
+
+
+    <!-- Back Button -->
+   <div class="flex items-center gap-3">
+  
+  <!-- Back Button -->
+  <a href="crops.html"
+     class="inline-flex items-center gap-2 px-4 py-2
+            bg-green-600 text-white font-semibold
+            rounded-lg shadow hover:shadow-xl hover:scale-105 transition">
+    ⬅️ Back
+  </a>
+
+  <!-- Next Button -->
+  <a id="nextAdvisory"
+     class="inline-flex items-center gap-2 px-4 py-2
+            bg-green-500 text-white font-semibold
+            rounded-lg shadow hover:shadow-xl hover:bg-green-600
+            hover:scale-105 transition cursor-pointer">
+    ➡️ Next
+  </a>
+
+</div>
+
+
+    
+    
+  </div>
+</nav>
+
+<!-- ================= MAIN ================= -->
+<main class="flex-1 flex flex-col items-center px-6 pt-20">
+
+
+  <!-- Header -->
+  <section class="max-w-lg text-center bg-white/70 backdrop-blur-xl
+                  rounded-xl p-6 shadow-xl border border-white/40">
+    <h1 class="text-[26px] font-extrabold text-green-700">
+      Fertilizer Recommendation
+    </h1>
+    <p class="mt-2 text-slate-700 text-[15px]">
+      Scientifically curated fertilizer plan to enhance soil nutrition
+      and maximize crop yield.
+    </p>
+  </section>
+
+  <!-- Card Area -->
+  <div class="flex justify-center w-full mt-10">
+
+    <div id="list" class="transition-all duration-300"></div>
+  </div>
+
+</main>
+
+<!-- Hidden Google Translate -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<!-- ================= FERTILIZER SCRIPT ================= -->
+<script>
+  const cropId = new URLSearchParams(window.location.search).get("crop_id");
+
+  fetch(`http://localhost:5000/api/crops/${cropId}/fertilizers`)
+    .then(res => res.json())
+    .then(data => {
+
+      const box = document.getElementById("list");
+
+      if (data.length === 1) {
+        box.className = "flex justify-center items-center";
+      } else {
+        box.className =
+  "flex flex-wrap justify-center gap-6 max-w-6xl mx-auto";
+
+      }
+
+      data.forEach(f => {
+        box.innerHTML += `
+          <div class="bg-white/85 backdrop-blur-xl rounded-xl shadow-lg
+                      border border-white/40 p-6 w-[360px]
+                      transition-all duration-300
+                      hover:-translate-y-1 hover:shadow-xl">
+
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-lg
+                          bg-green-100 text-green-700 text-2xl shadow-inner">
+                🔋
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-800">
+                  ${f.fertilizer_name}
+                </h2>
+                <p class="text-sm text-slate-500">
+                  Recommended Input
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-slate-700 text-[16px]">
+              <div class="flex justify-between">
+                <span class="font-medium">📦 Quantity</span>
+                <span class="font-semibold">${f.quantity}</span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="font-medium">⏳ Stage</span>
+                <span class="font-semibold">${f.application_stage}</span>
+              </div>
+
+              <div class="bg-slate-50 rounded-lg p-3 italic
+                          text-slate-600 border leading-relaxed">
+                💡 ${f.purpose}
+              </div>
+            </div>
+
+            <div class="mt-4 pt-2 border-t text-sm flex justify-between items-center">
+              <span class="text-slate-500">CropSevai Advisory</span>
+              <span class="text-green-600 font-semibold">✔ Verified</span>
+            </div>
+
+          </div>
+        `;
+      });
+    });
+</script>
+
+<!-- ================= LANGUAGE SCRIPT ================= -->
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      {
+        pageLanguage: "en",
+        includedLanguages: "en,ta",
+        autoDisplay: false
+      },
+      "google_translate_element"
+    );
+  }
+
+  function setActive(lang) {
+  const ta = document.getElementById("btn-ta");
+  const en = document.getElementById("btn-en");
+
+  // Reset
+  [ta, en].forEach(b => {
+    b.className =
+      "flex items-center gap-1 px-4 py-1.5 text-sm font-semibold rounded-full transition text-slate-600";
+  });
+
+  // Active style (matches image)
+  const active = lang === "ta" ? ta : en;
+  active.className += " bg-blue-600 text-white shadow";
+}
+
+
+  function waitAndTranslate(lang) {
+    const interval = setInterval(() => {
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = lang;
+        select.dispatchEvent(new Event("change"));
+        localStorage.setItem("lang", lang);
+        setActive(lang);
+        clearInterval(interval);
+      }
+    }, 100);
+  }
+
+  function translateTamil() {
+    waitAndTranslate("ta");
+  }
+
+  function translateEnglish() {
+    waitAndTranslate("en");
+  }
+
+  window.addEventListener("load", () => {
+    const savedLang = localStorage.getItem("lang") || "en";
+    waitAndTranslate(savedLang);
+  });
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  const nextBtn = document.getElementById("nextAdvisory");
+
+  nextBtn.onclick = () => {
+    if (!cropId) {
+      alert("Crop ID missing");
+      return;
+    }
+    window.location.href = `advisory.html?crop_id=${cropId}`;
+  };
+</script>
+
+
+</body>
+</html>

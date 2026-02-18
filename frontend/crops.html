@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CropSevai Hub | Crops</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  body{
+    background: linear-gradient(135deg, #d9fbe8 0%, #f7fcbf 100%);
+    font-family: 'Inter', sans-serif;
+  }
+  .glass{
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(18px);
+  }
+</style>
+</head>
+
+<body class="min-h-screen">
+
+<!-- Header -->
+<div class="glass shadow-md px-10 py-5 flex justify-between items-center sticky top-0 z-50">
+
+  <!-- Left: Title -->
+  <h1 class="text-2xl font-extrabold text-green-700 flex items-center gap-2">
+    🌿 CropSevai Hub
+  </h1>
+
+  <!-- Right: Back Button -->
+  <a href="dashboard.html"
+     class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full
+            font-semibold shadow hover:bg-green-200 transition">
+    ⬅️ Dashboard
+  </a>
+
+</div>
+
+
+<!-- Title + Search -->
+<div class="px-10 py-10 flex justify-between items-center">
+  <!-- Left: Title -->
+  <div>
+    <h2 class="text-5xl font-extrabold text-slate-800">Crops Database</h2>
+    <p class="text-slate-500 mt-3 text-xl">
+      Select a crop to view diseases, fertilizers & advisory
+    </p>
+  </div>
+
+  <!-- Right: Search Bar -->
+  <div>
+    <input id="searchInput" type="text" placeholder="Search..."
+           class="w-48 px-4 py-2 rounded-full border border-gray-300 shadow-sm 
+                  text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+  </div>
+</div>
+
+<!-- Crop Grid -->
+<div id="cropList"
+     class="px-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 pb-20">
+</div>
+
+<script>
+const cropImages = {
+  Rice: "rice.jpg",
+  Wheat: "wheat.jpg",
+  Cotton: "cotton.jpg",
+  Maize: "maize.jpg",
+  Sugarcane: "sugarcane.jpg",
+  Onion: "onion.jpg",
+  Tomato: "tomato.jpg",
+  Chilli: "chilli.jpg",
+  Turmeric: "turmaric.jpg",
+  Brinjal: "brinjal.jpg",
+  Carrot: "carrot.jpg",
+  Beans: "beans.jpg",
+  Beetroot: "beetroot.jpg",
+  BitterGourd: "bittergourd.jpg",
+  Pumpkin: "pumkin.jpg",
+  Cucumber: "cucumber.jpg",
+  Watermelon: "watermelon.jpg",
+  BottleGourd: "bottlegourd.jpg",
+  RidgeGourd: "ridgegourd.jpg",
+  SnakeGourd: "snakegourd.jpg",
+  Cauliflower: "cauliflower.jpg",
+  Coriander: "coriander.jpg",
+  Potato: "potato.jpg",
+  Guava: "guava.jpg",
+  Papaya: "papaya.jpg",
+  Mango: "mango.jpg",
+  Banana: "banana.jpg",
+  Apple: "apple.jpg",
+  Groundnut: "groundnut.jpg",
+  Tea: "tea.jpg"
+
+
+
+
+
+    
+};
+
+let allCrops = [];
+
+fetch("http://localhost:5000/api/crops")
+.then(res => res.json())
+.then(crops => {
+  allCrops = crops;
+  renderCrops(allCrops);
+});
+
+function renderCrops(crops){
+  const box = document.getElementById("cropList");
+  box.innerHTML = "";
+
+  crops.forEach(c => {
+    const img = cropImages[c.name] || "rice.jpg";
+
+    box.innerHTML += `
+      <div class="flex justify-center">
+        <div class="w-full max-w-sm rounded-[26px] overflow-hidden shadow-xl group transform transition hover:-translate-y-2 hover:shadow-2xl">
+
+          <!-- Image Container -->
+          <div class="relative h-[300px] bg-transparent">
+
+            <!-- Image with inset spacing -->
+            <div class="absolute inset-3 rounded-[22px] overflow-hidden">
+              <img src="${img}"
+                   class="w-full h-full object-cover transform transition duration-700 group-hover:scale-110">
+            </div>
+
+            <!-- Bottom gradient only for text readability -->
+            <div class="absolute inset-x-3 bottom-3 h-28
+                        rounded-b-[22px]
+                        bg-gradient-to-t
+                        from-black/60 via-black/30 to-transparent">
+            </div>
+
+            <!-- Season Badge -->
+            <div class="absolute top-6 right-6
+                        bg-white/90 text-green-700
+                        px-4 py-1 rounded-full
+                        text-sm font-medium shadow">
+              ${c.season}
+            </div>
+
+            <!-- Content -->
+            <div class="absolute inset-x-3 bottom-3 p-4">
+
+              <!-- Crop Name -->
+              <h2 class="text-2xl font-semibold text-white drop-shadow mb-2">
+                ${c.name}
+              </h2>
+
+              <!-- Soil & Water -->
+              <div class="flex justify-between text-white/90 text-sm mb-4">
+                <span>🟫
+ Soil: <b>${c.soil_type}</b></span>
+                <span>💧 Water: <b>${c.water_requirement}</b></span>
+              </div>
+
+              <!-- Buttons -->
+              <div class="grid grid-cols-3 gap-2">
+                <a href="disease.html?crop_id=${c.id}"
+                   class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-xs font-medium text-center shadow transition">
+                  🦠 Diseases
+                </a>
+                <a href="fertilizer.html?crop_id=${c.id}"
+                   class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-medium text-center shadow transition">
+                  🧪 Fertilizer
+                </a>
+                <a href="advisory.html?crop_id=${c.id}"
+                   class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg text-xs font-medium text-center shadow transition">
+                  ⚠ Advisory
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Search functionality
+document.getElementById("searchInput").addEventListener("input", function(e){
+  const query = e.target.value.toLowerCase();
+  const filtered = allCrops.filter(c => c.name.toLowerCase().includes(query));
+  renderCrops(filtered);
+});
+</script>
+
+</body>
+</html>

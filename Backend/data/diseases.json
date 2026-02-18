@@ -1,0 +1,18 @@
+{
+  "Rice": [
+    {
+      "name": "Rice Blast",
+      "symptoms": "White lesions on leaves",
+      "treatment": "Tricyclazole fungicide",
+      "prevention": "Use resistant varieties"
+    }
+  ],
+  "Wheat": [
+    {
+      "name": "Wheat Rust",
+      "symptoms": "Rust-colored spots",
+      "treatment": "Propiconazole",
+      "prevention": "Early sowing"
+    }
+  ]
+}

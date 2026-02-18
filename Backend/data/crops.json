@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "Rice", "area": "Wetland", "season": "Kharif" },
+  { "id": 2, "name": "Wheat", "area": "Dryland", "season": "Rabi" },
+  { "id": 3, "name": "Maize", "area": "Moderate", "season": "Kharif" }
+]

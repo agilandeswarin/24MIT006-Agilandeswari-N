@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CropSevai – AI Advisory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc, #e0f2fe);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card-hover:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+    }
+
+    /* Hide Google Translate UI */
+    .goog-logo-link,
+    .goog-te-gadget,
+    body > .skiptranslate {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-10 text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<div class="flex items-center justify-between mb-12">
+  <div class="flex items-center gap-3">
+    <span class="text-3xl">🌱</span>
+    <span class="text-2xl font-extrabold text-green-700 tracking-wide">
+      CropSevai
+    </span>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <!-- Back Button -->
+    <a href="crops.html"
+       class="inline-flex items-center gap-2 px-4 py-2
+              bg-green-600 text-white font-semibold
+              rounded-lg shadow hover:shadow-xl hover:scale-105 transition">
+      ⬅️ Back
+    </a>
+
+    <!-- Language Switch -->
+    <div class="flex items-center gap-2 bg-white/70 backdrop-blur-md
+                border border-gray-200 rounded-xl p-1 shadow-sm
+                notranslate"
+         translate="no">
+
+      <button id="btn-ta" onclick="translateTamil()"
+        class="lang-btn flex items-center gap-2 px-4 py-2 rounded-lg
+               text-sm font-semibold transition-all">
+        🌐 தமிழ்
+      </button>
+
+      <button id="btn-en" onclick="translateEnglish()"
+        class="lang-btn flex items-center gap-2 px-4 py-2 rounded-lg
+               text-sm font-semibold transition-all">
+        🌐 English
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= HERO ================= -->
+<header class="mb-12 text-center md:text-left">
+  <h1 class="text-5xl font-bold text-gray-900 mb-4">
+    ⚠️ AI Crop Advisory Dashboard
+  </h1>
+  <p class="text-gray-600 text-lg max-w-xl mx-auto md:mx-0">
+    Real-time insights, risk levels, and proactive recommendations for all your crops.
+  </p>
+</header>
+
+<!-- ================= ADVISORY CARDS ================= -->
+<div id="box" class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+<!-- Hidden Google Translate -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+  const cropId = new URLSearchParams(window.location.search).get("crop_id");
+
+  fetch(`http://localhost:5000/api/crops/${cropId}/advisory`)
+    .then(res => res.json())
+    .then(data => {
+      const box = document.getElementById("box");
+      box.innerHTML = "";
+
+      data.forEach(a => {
+        const color =
+          a.risk_level === "High"
+            ? "from-red-50 to-red-100 border-red-400"
+            : a.risk_level === "Medium"
+              ? "from-yellow-50 to-yellow-100 border-yellow-400"
+              : "from-green-50 to-green-100 border-green-400";
+
+        const icon =
+          a.risk_level === "High" ? "⚠️" :
+          a.risk_level === "Medium" ? "⚡" : "✅";
+
+        box.innerHTML += `
+          <div class="card-hover p-6 rounded-2xl shadow-lg
+                      bg-gradient-to-br ${color}
+                      border border-opacity-40 transition-transform duration-500">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="text-3xl">${icon}</span>
+              <h2 class="text-xl font-semibold">${a.risk_level} Risk</h2>
+            </div>
+            <p class="text-gray-700 leading-relaxed">${a.advice}</p>
+          </div>
+        `;
+      });
+    });
+
+  /* ========== GOOGLE TRANSLATE INIT ========== */
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      {
+        pageLanguage: "en",
+        includedLanguages: "en,ta",
+        autoDisplay: false
+      },
+      "google_translate_element"
+    );
+  }
+
+  /* ========== BUTTON STATE ========== */
+  function setActive(lang) {
+    const ta = document.getElementById("btn-ta");
+    const en = document.getElementById("btn-en");
+
+    [ta, en].forEach(btn => {
+      btn.classList.remove(
+        "bg-gradient-to-r",
+        "from-blue-600",
+        "to-blue-500",
+        "text-white",
+        "shadow"
+      );
+      btn.classList.add("bg-white", "text-gray-700");
+    });
+
+    const active = lang === "ta" ? ta : en;
+    active.classList.remove("bg-white", "text-gray-700");
+    active.classList.add(
+      "bg-gradient-to-r",
+      "from-blue-600",
+      "to-blue-500",
+      "text-white",
+      "shadow"
+    );
+  }
+
+ 
+  function translateTamil() {
+    const interval = setInterval(() => {
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = "ta";
+        select.dispatchEvent(new Event("change"));
+        localStorage.setItem("lang", "ta");
+        setActive("ta");
+        clearInterval(interval);
+      }
+    }, 100);
+  }
+
+
+  function translateEnglish() {
+    const select = document.querySelector(".goog-te-combo");
+    if (!select) return;
+    select.value = "en";
+    select.dispatchEvent(new Event("change"));
+    localStorage.setItem("lang", "en");
+    setActive("en");
+  }
+
+  window.addEventListener("load", () => {
+    const savedLang = localStorage.getItem("lang") || "en";
+    setTimeout(() => {
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = savedLang;
+        select.dispatchEvent(new Event("change"));
+        setActive(savedLang);
+      }
+    }, 600);
+  });
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
