@@ -17,8 +17,12 @@ const db = await mysql.createPool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   waitForConnections: true,
-  connectionLimit: 10
+  connectionLimit: 10,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
 
 console.log("✅ MySQL Pool Connected");
 
@@ -141,6 +145,40 @@ app.get("/api/crops/:id", async (req, res) => {
   res.json(data);
 });
 
+
+/* USERS */
+app.get("/api/users", async (req, res) => {
+  try {
+    const [data] = await db.query("SELECT * FROM users");
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ALL DISEASES */
+app.get("/api/diseases", async (req, res) => {
+  try {
+    const [data] = await db.query("SELECT * FROM diseases");
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ALL FERTILIZERS */
+app.get("/api/fertilizers", async (req, res) => {
+  try {
+    const [data] = await db.query("SELECT * FROM fertilizers");
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
 app.get("/api/crops/:id/diseases", async (req, res) => {
   try {
     const cropId = req.params.id;
@@ -174,14 +212,28 @@ app.get("/api/crops/:id/fertilizers", async (req, res) => {
   res.json(data);
 });
 
+/* ALL ADVISORY */
+/* CROP ADVISORY */
 app.get("/api/crops/:id/advisory", async (req, res) => {
-  const [data] = await db.query(
-    "SELECT * FROM advisory WHERE crop_id=?",
-    [req.params.id]
-  );
-  res.json(data);
+  try {
+    const cropId = req.params.id;
+
+    const [rows] = await db.query(
+      "SELECT * FROM advisory WHERE crop_id = ?",
+      [cropId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.listen(5000, () => {
-  console.log("🚀 Backend running at http://localhost:5000");
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
 });
+
+

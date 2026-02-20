@@ -101,6 +101,16 @@
 <script>
   const cropId = new URLSearchParams(window.location.search).get("crop_id");
 
+if (!cropId) {
+  document.body.innerHTML = `
+    <div class="flex items-center justify-center h-screen text-2xl font-bold text-red-600">
+      No Crop Selected
+    </div>
+  `;
+  throw new Error("Crop ID missing");
+}
+
+
   fetch(`http://localhost:5000/api/crops/${cropId}/advisory`)
     .then(res => res.json())
     .then(data => {
