@@ -131,8 +131,19 @@ React.useEffect(() => {
       alert("Login failed");
     }
   })
-  .catch(() => alert("Server not running"));
+  .catch((err) => {
+    console.error("Login fetch error:", err);
+    alert("Server error: " + (err && err.message ? err.message : err));
+  });
 };
+
+// Health check to help debugging production connectivity
+React.useEffect(() => {
+  fetch(`${API_BASE_URL}/health`)
+    .then(r => r.json())
+    .then(d => console.log('Health:', d))
+    .catch(e => console.warn('Health check failed', e));
+}, []);
 
 
 
