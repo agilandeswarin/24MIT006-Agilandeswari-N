@@ -1,4 +1,14 @@
 {
+  "name": "cropsevaihub",
+  "version": "1.0.0",
+  "description": "CropSevaiHub - Agricultural Advisory System",
+  "main": "Backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node Backend/server.js",
+    "dev": "nodemon Backend/server.js",
+    "install-all": "npm install && cd Backend && npm install && cd .."
+  },
   "dependencies": {
     "body": "^5.1.0",
     "express": "^5.2.1",
