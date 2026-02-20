@@ -141,7 +141,12 @@ const cropImages = {
 
 };
 
-fetch("http://localhost:5000/api/crops/" + id)
+// Dynamic API URL
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
+
+fetch(`${API_BASE_URL}/api/crops/` + id)
 .then(res => res.json())
 .then(c => {
   cropName.innerText = c.name;
@@ -156,7 +161,7 @@ fetch("http://localhost:5000/api/crops/" + id)
   advisoryBtn.href = `advisory.html?crop_id=${c.id}`;
 });
 
-fetch("http://localhost:5000/api/crops/" + id + "/diseases")
+fetch(`${API_BASE_URL}/api/crops/` + id + "/diseases")
 .then(res => res.json())
 .then(data => {
   const box = document.getElementById("diseases");

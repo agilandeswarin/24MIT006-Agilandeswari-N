@@ -110,8 +110,12 @@ if (!cropId) {
   throw new Error("Crop ID missing");
 }
 
+// Dynamic API URL
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
 
-  fetch(`http://localhost:5000/api/crops/${cropId}/advisory`)
+  fetch(`${API_BASE_URL}/api/crops/${cropId}/advisory`)
     .then(res => res.json())
     .then(data => {
       const box = document.getElementById("box");

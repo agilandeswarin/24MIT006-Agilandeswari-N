@@ -63,6 +63,11 @@
 </div>
 
 <script>
+// Dynamic API URL that works in both local and production
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
+
 const cropImages = {
   Rice: "rice.jpg",
   Wheat: "wheat.jpg",
@@ -104,7 +109,7 @@ const cropImages = {
 
 let allCrops = [];
 
-fetch("http://localhost:5000/api/crops")
+fetch(`${API_BASE_URL}/api/crops`)
 .then(res => res.json())
 .then(crops => {
   allCrops = crops;

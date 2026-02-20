@@ -156,8 +156,13 @@ toggleBtn.onclick = () => {
   toggleBtn.textContent = darkMode ? "☀️" : "🌙";
 };
 
+// Dynamic API URL
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
+
 // Load Crop Info
-fetch(`http://localhost:5000/api/crops/${cropId}`)
+fetch(`${API_BASE_URL}/api/crops/${cropId}`)
 .then(res => res.json())
 .then(crop => {
   document.getElementById("cropName").innerText = crop.name;
@@ -166,7 +171,7 @@ fetch(`http://localhost:5000/api/crops/${cropId}`)
 });
 
 // Load Diseases
-fetch(`http://localhost:5000/api/crops/${cropId}/diseases`)
+fetch(`${API_BASE_URL}/api/crops/${cropId}/diseases`)
 .then(res => res.json())
 .then(list => {
   const box = document.getElementById("diseaseBox");

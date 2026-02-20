@@ -23,7 +23,12 @@
 <script>
 const id = new URLSearchParams(window.location.search).get("disease_id");
 
-fetch(`http://localhost:5000/api/disease/${id}`)
+// Dynamic API URL
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
+
+fetch(`${API_BASE_URL}/api/disease/${id}`)
 .then(res => res.json())
 .then(d => {
   document.getElementById("box").innerHTML = `
